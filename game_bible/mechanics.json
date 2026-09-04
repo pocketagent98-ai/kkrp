@@ -1,0 +1,9 @@
+{
+  "core_mechanic": "avoid_obstacles_collect_coins",
+  "timer": true,
+  "star_rating": {"max_stars": 3, "criteria": ["speed", "coin_collection", "no_crashes"]},
+  "lane_system": {"count": 3, "width": 2.0, "transition_speed": 0.2},
+  "jump": {"velocity": 0.25, "gravity": 0.015},
+  "collision": {"bounce_back": 2.0, "star_penalty": 1},
+  "coin_collection": {"radius": 0.8, "value": 10}
+}

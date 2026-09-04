@@ -1,0 +1,14 @@
+title: "Desert Rush: City Builder Escape"
+version: "1.0.0"
+genre: "hyper-casual"
+platform: "android"
+engine: "godot-4.7.2"
+offline: true
+multiplayer: false
+tagline: "No Ads, No Paywall — Pure Fun"
+description: "A 3D offline hyper-casual game where the player controls a delivery driver navigating from desert to modern city."
+target_markets: ["UAE", "Singapore", "Gulf", "Southeast Asia"]
+languages: ["en", "ar", "hi", "ms"]
+monetization:
+  current: "none"
+  future: ["cosmetic_skins", "season_pass", "optional_ads_game_over_only"]

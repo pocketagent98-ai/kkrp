@@ -1,0 +1,18 @@
+scoring:
+  time_bonus: 0.5
+  coin_value: 10
+  star_max: 3
+physics:
+  lane_transition_speed: 0.2
+  jump_velocity: 0.25
+  gravity: 0.015
+  bounce_back: 2.0
+collision:
+  player_vs_obstacle: bounce_back
+  player_vs_coin: collect
+  player_vs_finish: level_complete
+controls:
+  - { action: "move_left", inputs: ["ArrowLeft", "A", "SwipeLeft"] }
+  - { action: "move_right", inputs: ["ArrowRight", "D", "SwipeRight"] }
+  - { action: "jump", inputs: ["ArrowUp", "W", "Space", "SwipeUp"] }
+  - { action: "pause", inputs: ["P", "Escape"] }
