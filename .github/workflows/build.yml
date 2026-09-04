@@ -1,0 +1,66 @@
+name: Build Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      game_bible:
+        description: 'Path to game bible YAML'
+        required: false
+        default: 'game_spec.yaml'
+      build_target:
+        description: 'Build target'
+        required: false
+        default: 'web'
+        type: choice
+        options: [web, apk, aab, desktop]
+permissions:
+  contents: write
+env:
+  GODOT_VERSION: "4.7.2"
+jobs:
+  parse-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse spec
+        run: python3 agents/planner/planner.py --spec ${{ inputs.game_bible }} --checkpoints checkpoints/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checkpoints
+          path: checkpoints/
+  generate-code:
+    needs: parse-spec
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: checkpoints, path: checkpoints/}
+      - name: Generate code
+        run: python3 agents/coder/coder.py --checkpoints checkpoints/
+      - name: Review code
+        run: python3 agents/reviewer/reviewer.py --checkpoints checkpoints/ --source game/godot-project/scripts/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: game-code
+          path: game/
+  test:
+    needs: generate-code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: game-code, path: game/}
+      - name: Run tests
+        run: python3 agents/tester/tester.py --checkpoints checkpoints/ --project game/godot-project/
+      - uses: actions/upload-artifact@v4
+        with: {name: test-report, path: checkpoints/test_report.json}
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: game-code, path: game/}
+      - name: Build
+        run: python3 agents/builder/builder.py --checkpoints checkpoints/ --project game/godot-project/
+      - uses: actions/upload-artifact@v4
+        with: {name: apk, path: build/}

@@ -1,0 +1,24 @@
+name: Test Pipeline
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['game/**', 'agents/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Run planner
+        run: python3 agents/planner/planner.py --spec game_spec.yaml --checkpoints checkpoints/
+      - name: Run coder
+        run: python3 agents/coder/coder.py --checkpoints checkpoints/
+      - name: Run reviewer
+        run: python3 agents/reviewer/reviewer.py --checkpoints checkpoints/ --source game/godot-project/scripts/
+      - name: Run tester
+        run: python3 agents/tester/tester.py --checkpoints checkpoints/ --project game/godot-project/
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with: {name: test-report, path: checkpoints/test_report.json}

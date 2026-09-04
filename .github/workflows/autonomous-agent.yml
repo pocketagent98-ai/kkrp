@@ -1,0 +1,54 @@
+name: Autonomous Agent Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      game_bible_path:
+        description: 'Path to game bible or spec YAML'
+        required: false
+        default: 'game_spec.yaml'
+        type: string
+      build_target:
+        description: 'Build target'
+        required: false
+        default: 'apk'
+        type: choice
+        options: [apk, aab, both, web]
+      skip_tests:
+        description: 'Skip test stage'
+        required: false
+        default: false
+        type: boolean
+      max_fix_iterations:
+        description: 'Max fix-test iterations'
+        required: false
+        default: 5
+        type: string
+permissions:
+  contents: write
+env:
+  GODOT_VERSION: "4.7.2"
+jobs:
+  autonomous-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Create sandbox
+        run: python3 automation/create_sandbox.py --workdir /tmp/sandbox
+      - name: Generate game
+        run: python3 automation/generate_game.py --spec ${{ inputs.game_bible_path }} --checkpoints checkpoints/ --max-fix-iterations ${{ inputs.max_fix_iterations }}
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with: {name: desert-rush-apk, path: build/}
+      - name: Upload checkpoints
+        uses: actions/upload-artifact@v4
+        with: {name: checkpoints, path: checkpoints/}
+      - name: Commit build
+        run: |
+          git config user.name "Game Factory Bot"
+          git config user.email "actions@github.com"
+          git add checkpoints/ build/
+          git commit -m "🎮 Autonomous build: $(date)" || echo "No changes"
+          git push
