@@ -1,0 +1,88 @@
+# KKRP Game Factory — Master Game Specification
+# यह फाइल आपकी पूरी game की master specification है।
+# इसमें आप अपना game brief लिखें, फिर workflow रन करें।
+# Agent इसे पढ़कर पूरा game plan → code → test → build करेगा।
+
+game:
+  title: "Desert Rush: City Builder Escape"
+  version: "1.0.0"
+  genre: "hyper-casual"
+  platform: "android"
+  engine: "godot-4.7.2"
+  offline: true
+  multiplayer: false
+
+  description: >
+    A 3D offline hyper-casual game where the player controls a delivery driver
+    navigating from desert to modern city. Avoid obstacles, collect coins,
+    and complete levels within the time limit.
+
+  target_markets: ["UAE", "Singapore", "Gulf", "Southeast Asia"]
+  languages: ["en", "ar", "hi", "ms"]
+
+  monetization:
+    current: "none"
+    future: ["cosmetic_skins", "season_pass", "optional_ads_game_over_only"]
+
+world:
+  type: "linear_levels"
+  size: "medium"
+  total_levels: 5
+  themes:
+    - {name: "Desert Dawn", environment: "desert", time_of_day: "dawn"}
+    - {name: "Sand Storm", environment: "desert", weather: "sandstorm"}
+    - {name: "Desert to City", environment: "transition"}
+    - {name: "City Rush", environment: "city", time_of_day: "day"}
+    - {name: "Singapore Skyline", environment: "city", time_of_day: "night"}
+
+player:
+  character: "delivery_driver"
+  vehicle: "car"
+  controls: ["touch_swipe", "on_screen_buttons", "keyboard_arrow_keys"]
+  abilities: ["lane_change", "jump", "collect_coins"]
+  lanes: 3
+
+npcs:
+  count: 0
+  ai: false
+
+missions:
+  count: 5
+  type: "level_based"
+
+graphics:
+  style: "stylized_3d"
+  renderer: "mobile"
+  target_fps: 60
+
+audio:
+  voice: false
+  music: true
+  sound_effects: true
+
+requirements:
+  offline: true
+  multiplayer: false
+  build_size_target: "<150 MB"
+  min_android_version: "8.0"
+  min_ios_version: "14.0"
+
+storage_architecture:
+  source_code: "github"
+  large_assets: "cloudflare_r2"
+  backup: "backblaze_b2"
+  user_data: "supabase"
+  ai_models: "huggingface"
+
+ai_pipeline:
+  planner: "capability_registry"
+  orchestrator: "deepseek_harness"
+  sandbox: "opensandbox"
+  asset_generation:
+    detailed_3d: "blender_worker"
+    simple_procedural: "godot_procedural"
+    world_generation: "cosmos_worker"
+  testing:
+    unit: "gdunit4"
+    gameplay_qa: "automated_agent"
+    security: "strix_sast"

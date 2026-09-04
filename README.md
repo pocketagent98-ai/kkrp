@@ -1,153 +1,82 @@
-# 🎮 KKRP Game Factory
+# Game Factory
 
-> AI-powered game development pipeline — give a Game Bible, get a playable game.
-> Built with Godot 4.7.2, GitHub Actions, and a capability-based AI agent system.
+An autonomous, AI-driven game generation system that takes a YAML game specification and produces a fully playable, tested Android APK — no manual coding required.
 
-## 🏜️ Current Game: Desert Rush — City Builder Escape
-
-A 3D offline hyper-casual game designed for UAE, Singapore, and Gulf/SE Asia markets.
-
-- **No Ads, No Paywall — Pure Fun**
-- 5 levels: Desert → City progression
-- 3-lane endless runner with coins, obstacles, star ratings
-- Offline ready, mobile-first
-- Languages: English, Arabic, Hindi, Malay
-
-### Play Now
-Open `index.html` in any modern browser. Works offline.
-
-## 🏗️ Architecture
-
-```
-YOU
-  ↓
-Game Bible (YAML)
-  ↓
-GitHub Actions Workflow
-  ↓
-┌─────────────────────────┐
-│   Game Factory Pipeline  │
-│  ├─ Parse Bible          │
-│  ├─ Build Task Graph     │
-│  ├─ Select Capabilities  │
-│  ├─ Generate Code        │
-│  ├─ Generate Assets      │
-│  ├─ Build (Godot/Web)    │
-│  ├─ Run Tests            │
-│  ├─ QA (Gameplay/Perf)   │
-│  ├─ Security Scan       │
-│  └─ Release Artifact     │
-└─────────────────────────┘
-  ↓
-Build Output (HTML5 / APK / Desktop)
-```
-
-### Storage Architecture
-
-| Service | Purpose |
-|---------|---------|
-| GitHub | Source code, workflows, configs |
-| Hugging Face | AI models, datasets, large assets |
-| Cloudflare R2 | Production assets, CDN, builds |
-| Backblaze B2 | Secondary backup |
-| Supabase | Users, auth, database, cloud saves |
-
-### Server Architecture
-
-```
-INTERNET
-    │
-    ├── Cloudflare (Edge/Durable Objects) ── Matchmaking, Lobby, Presence
-    │
-    ├── Supabase ── Auth, DB, Cloud Save, Inventory
-    │
-    └── Oracle Cloud (Always Free VM)
-        └── Godot Dedicated Server
-            ├── Room 1 (Players)
-            ├── Room 2 (Players)
-            └── Room 3 (Players)
-```
-
-## 🚀 Quick Start
-
-### Play the Game
-```bash
-# Just open in browser
-open index.html
-# Or serve locally
-python3 -m http.server 8000
-# Visit http://localhost:8000
-```
-
-### Run the Game Factory Workflow
-1. Edit `game_bible.yaml` with your game spec
-2. Go to GitHub Actions tab
-3. Select "Game Factory" workflow
-4. Click "Run workflow"
-5. Choose build target (web/android/desktop)
-6. Download the artifact
-
-### Create Your Own Game
-1. Copy `game_bible.yaml`
-2. Fill in your game details (title, genre, levels, etc.)
-3. Commit to repository
-4. Run the workflow
-5. Get your game build
-
-## 🎮 Game Controls
-
-| Action | Keyboard | Touch |
-|--------|----------|-------|
-| Move Left | ← / A | Swipe Left / ◀ Button |
-| Move Right | → / D | Swipe Right / ▶ Button |
-| Jump | ↑ / W / Space | Swipe Up / ⤴ Button |
-| Pause | P / ⏸ | ⏸ Button |
-
-## 📁 Project Structure
-
-```
-kkrp/
-├── index.html              # Playable game (HTML5, offline)
-├── game_bible.yaml         # Game specification template
-├── README.md               # This file
-├── .github/
-│   └── workflows/
-│       └── game_factory.yml  # CI/CD pipeline
-└── projects/               # Generated game builds (auto-created)
-    └── GME-YYYYMMDD-HHMMSS/
-        ├── builds/
-        │   └── web/
-        │       └── index.html
-        ├── releases/
-        ├── assets/
-        └── reports/
-            └── release_report.md
-```
-
-## 🔧 Technical Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Game Engine | Godot 4.7.2 Stable |
-| Web Runtime | Three.js (HTML5) |
-| CI/CD | GitHub Actions |
-| AI Orchestrator | DeepSeek Harness / OpenManus |
-| Sandbox | OpenSandbox |
-| Asset Generation | Blender, ComfyUI, NVIDIA Cosmos |
-| Testing | GdUnit4 |
-| Security | Strix SAST + dependency scan |
-
-## 🌍 Future Monetization (2-3 months post-launch)
-
-- Cosmetic skins (vehicles, characters)
-- Season pass (new cities: Abu Dhabi, Kuala Lumpur, Bangkok)
-- Optional ads (game-over screen only)
-- Branded levels (Emirates, Singapore Airlines)
-
-## 📄 License
-
-MIT License — Free to use, modify, and distribute.
+Built around **"Desert Rush: City Builder Escape"**, a hyper-casual 3-lane endless runner that journeys from the Gulf deserts to the Singapore skyline.
 
 ---
 
-Built with ❤️ by KKRP Game Factory
+## How It Works
+
+```
+game_spec.yaml ──► Planner ──► Coder ──► Reviewer ──► Tester ──► Builder ──► APK
+                      │            │           │            │           │
+                      ▼            ▼           ▼            ▼           ▼
+                 task_graph    scripts/   review_report  test_report  build_report
+```
+
+1. You write `game_spec.yaml` — the master specification.
+2. The **planner** breaks it into a task graph across 8 categories (Core, World, NPC, Missions, Combat, Inventory, UI, Audio).
+3. The **coder** generates functional GDScript for each task.
+4. The **reviewer** checks the code for syntax errors, missing type hints, hardcoded secrets, and leftover placeholders.
+5. The **tester** runs GdUnit4 tests + headless gameplay, detects crashes, and implements a Generate→Test→Diagnose→Fix→Test loop.
+6. The **builder** exports an APK using the Godot 4.7.2 CLI.
+7. Every stage writes a checkpoint to `checkpoints/` so the pipeline is resumable.
+
+---
+
+## Project Structure
+
+```
+game-agent/
+├── game/godot-project/      # Godot 4.7.2 game project
+│   ├── project.godot
+│   ├── scenes/Main.tscn
+│   └── scripts/ (Main.gd, GameManager.gd, GameConfig.gd)
+├── agents/                   # AI agents (Python)
+│   ├── planner/              # Reads spec → creates task graph
+│   ├── coder/                # Task graph → GDScript code
+│   ├── reviewer/             # Code review & static analysis
+│   ├── tester/               # GdUnit4 + headless test loop
+│   └── builder/              # Godot CLI → APK export
+├── game_bible/               # Game design documents (YAML + JSON)
+├── automation/               # Orchestration scripts
+├── supabase/                 # Backend (migrations + edge functions)
+├── checkpoints/              # Pipeline state (resumable)
+├── .github/workflows/        # CI/CD pipelines (build, test, autonomous)
+├── capabilities.yaml         # Capability registry + LLM providers
+├── game_spec.yaml            # Master game specification (THE INPUT)
+└── README.md
+```
+
+## Game: Desert Rush
+
+**Genre:** Hyper-casual 3-lane endless runner
+**Platform:** Android (offline-first)
+**Engine:** Godot 4.7.2 (Mobile renderer)
+**Languages:** English, Arabic, Hindi, Malay
+**Target Markets:** UAE, Singapore, Gulf, SE Asia
+**Monetization:** None at launch
+
+### Levels
+| # | Name | Theme | Time Limit |
+|---|------|-------|------------|
+| 1 | Desert Dawn | Desert | 60s |
+| 2 | Sand Storm | Sandstorm | 55s |
+| 3 | Desert to City | Transition | 50s |
+| 4 | City Rush | City | 45s |
+| 5 | Singapore Skyline | City Night | 40s |
+
+## CI/CD
+
+### Build Pipeline (`build.yml`)
+14-stage pipeline: `01_parse_spec → 02_plan_game → ... → 14_cleanup`
+
+### Autonomous Pipeline (`autonomous-agent.yml`)
+Manual trigger with `game_bible_path`, `build_target`, `skip_tests`, `max_fix_iterations` inputs.
+
+## Backend (Supabase)
+11 tables with RLS: users, profiles, player_progress, inventory, quests, achievements, settings, friends, cloud_saves, purchases, game_sessions.
+
+## License
+MIT

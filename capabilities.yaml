@@ -1,111 +1,90 @@
-# Capability Registry
-# The agent uses this to decide which tools to activate per task.
-# Only needed capabilities are loaded — no fixed toolchain.
+# Game Factory — Capability Registry
+version: "1.0.0"
+project: "Desert Rush: City Builder Escape"
+
+llm_providers:
+  primary:
+    name: "openai"
+    model: "gpt-4o"
+    api_key_env: "OPENAI_API_KEY"
+  secondary:
+    name: "anthropic"
+    model: "claude-3-5-sonnet"
+    api_key_env: "ANTHROPIC_API_KEY"
+  local:
+    name: "ollama"
+    model: "llama3:8b"
+    endpoint: "http://localhost:11434"
+  fallback:
+    name: "template"
+    model: "none"
+    description: "Rule-based code generation when no LLM is available"
 
 capabilities:
-  # === CODE GENERATION ===
   code_generation:
-    description: "Generate GDScript / C# code for Godot"
-    tools:
-      - deepseek_harness
-      - openmanus
-    triggered_when: "always"
-
-  # === ASSET GENERATION ===
+    description: "Generate GDScript code from task descriptions"
+    enabled: true
+    agent: "coder"
+    providers: [primary, secondary, local, fallback]
   asset_simple:
-    description: "Procedural simple assets in Godot"
-    tools:
-      - godot_procedural
-    triggered_when: "need_simple_geometry"
-
+    description: "Procedural meshes, materials, textures"
+    enabled: true
+    agent: "coder"
+    providers: [primary, fallback]
   asset_detailed:
-    description: "Detailed 3D models via Blender"
-    tools:
-      - blender_worker
-    triggered_when: "need_complex_3d"
-
-  asset_visual:
-    description: "Textures and 2D art via ComfyUI"
-    tools:
-      - comfyui
-    triggered_when: "need_textures_or_2d"
-
+    description: "Detailed 2D/3D assets via image generation"
+    enabled: false
+    agent: "asset_generator"
   world_generation:
-    description: "World/terrain generation via NVIDIA Cosmos"
-    tools:
-      - cosmos_worker
-    triggered_when: "need_world_generation"
-    note: "Cosmos outputs need Godot-side assembly for playability"
-
-  # === TESTING ===
+    description: "Generate game worlds, levels, terrain"
+    enabled: true
+    agent: "planner"
+    providers: [primary, secondary, fallback]
   unit_testing:
-    description: "Run GdUnit4 tests"
-    tools:
-      - gdunit4
-    triggered_when: "post_code_generation"
-
+    description: "GdUnit4 test generation and running"
+    enabled: true
+    agent: "tester"
+    providers: [primary, secondary, fallback]
+    framework: "GdUnit4"
+    coverage_target: 0.8
   gameplay_qa:
-    description: "Automated gameplay testing"
-    tools:
-      - gameplay_qa_agent
-    triggered_when: "post_build"
-
-  performance_qa:
-    description: "Performance profiling"
-    tools:
-      - godot_profiler
-    triggered_when: "post_build"
-
-  # === SECURITY ===
+    description: "Headless gameplay testing with crash detection"
+    enabled: true
+    agent: "tester"
+    providers: [fallback]
+    crash_detection: true
   security_scan:
-    description: "SAST, dependency scan, secret scan"
-    tools:
-      - strix_sast
-      - dependency_scanner
-      - secret_scanner
-    triggered_when: "pre_release"
-
-  # === INFRASTRUCTURE ===
+    description: "Scan for security vulnerabilities"
+    enabled: true
+    agent: "reviewer"
+    providers: [fallback]
+    checks: [hardcoded_secrets, sql_injection, xss]
   authentication:
     description: "User auth via Supabase"
-    tools:
-      - supabase_auth
-    triggered_when: "need_user_accounts"
-
+    enabled: true
+    provider: "supabase"
+    methods: [email_password, oauth_google, anonymous]
+    offline_fallback: "local_save"
   realtime:
-    description: "Realtime coordination via Cloudflare DO"
-    tools:
-      - cloudflare_durable_objects
-    triggered_when: "need_multiplayer"
-
+    description: "Real-time multiplayer"
+    enabled: false
   multiplayer_server:
-    description: "Authoritative game server"
-    tools:
-      - godot_dedicated_server
-    triggered_when: "need_authoritative_multiplayer"
+    description: "Dedicated multiplayer server"
+    enabled: false
+    max_players: 1
 
-# === LLM PROVIDERS ===
-providers:
-  - name: omniRoute
-    priority: 1
-  - name: google
-    priority: 2
-    models:
-      - gemini-3.7-flash
-      - gemini-3.6-flash
-      - gemini-3.5-flash
-      - gemini-3.5-flash-lite
-      - gemma-4-31b-it
-      - gemma-4-26b-a4b-it
-  - name: nvidia
-    priority: 3
-  - name: nararouter
-    priority: 4
-
-# === DECISION POLICY ===
-policy:
-  - "Always use latest stable Godot (currently 4.7.2)"
-  - "Never auto-upgrade engine without migration testing"
-  - "Never deploy without passing all QA stages"
-  - "Legal compliance is human-reviewed, not AI-guaranteed"
-  - "Store all project records permanently in projects/ directory"
+pipeline_stages:
+  - {id: "01_parse_spec", name: "Parse Specification", required: true}
+  - {id: "02_plan_game", name: "Plan Game", required: true}
+  - {id: "03_create_tasks", name: "Create Task Graph", required: true}
+  - {id: "04_start_sandbox", name: "Start Sandbox", required: true}
+  - {id: "05_generate_code", name: "Generate Code", required: true}
+  - {id: "06_generate_assets", name: "Generate Assets", required: false}
+  - {id: "07_import_assets", name: "Import Assets", required: true}
+  - {id: "08_build_godot", name: "Build Godot Project", required: true}
+  - {id: "09_run_tests", name: "Run Tests", required: true}
+  - {id: "10_ai_review", name: "AI Code Review", required: true}
+  - {id: "11_fix_errors", name: "Fix Errors", required: true}
+  - {id: "12_build_apk", name: "Build APK", required: true}
+  - {id: "13_upload_artifact", name: "Upload Artifact", required: true}
+  - {id: "14_cleanup", name: "Cleanup", required: true}
