@@ -1,0 +1,7 @@
+{
+  "procedural": ["road", "buildings", "vehicles", "characters", "coins", "obstacles"],
+  "external": [],
+  "audio": ["engine_rev", "coin_collect", "crash", "level_complete_jingle"],
+  "ui": ["menu", "hud", "controls", "pause"],
+  "note": "All assets generated procedurally via Godot SurfaceTool/ArrayMesh"
+}

@@ -1,0 +1,11 @@
+{
+  "player": {"name": "Driver", "type": "delivery_driver", "vehicle": "car", "color": "#e84545", "abilities": ["lane_change", "jump", "collect_coins"], "lanes": 3},
+  "npcs": {"count": 0, "ai": false},
+  "vehicles": [
+    {"level": 1, "name": "Standard Car", "color": "#e84545"},
+    {"level": 2, "name": "Desert Buggy", "color": "#f5a623"},
+    {"level": 3, "name": "City Taxi", "color": "#ffcc00"},
+    {"level": 4, "name": "Sports Car", "color": "#00ff88"},
+    {"level": 5, "name": "Night Rider", "color": "#aa00ff"}
+  ]
+}

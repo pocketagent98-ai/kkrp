@@ -1,0 +1,13 @@
+{
+  "type": "linear_levels",
+  "total_levels": 5,
+  "road_length": 200,
+  "lanes": 3,
+  "levels": [
+    {"level": 1, "name": "Desert Dawn", "environment": "desert", "time_limit": 60, "speed": 0.30, "obstacles": 15, "coins": 20},
+    {"level": 2, "name": "Sand Storm", "environment": "desert", "time_limit": 55, "speed": 0.35, "obstacles": 20, "coins": 25},
+    {"level": 3, "name": "Desert to City", "environment": "transition", "time_limit": 50, "speed": 0.40, "obstacles": 25, "coins": 30},
+    {"level": 4, "name": "City Rush", "environment": "city", "time_limit": 45, "speed": 0.45, "obstacles": 30, "coins": 35},
+    {"level": 5, "name": "Singapore Skyline", "environment": "city", "time_limit": 40, "speed": 0.50, "obstacles": 35, "coins": 40}
+  ]
+}

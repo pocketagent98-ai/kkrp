@@ -1,0 +1,9 @@
+{
+  "architecture": "game_spec \u2192 planner \u2192 task_graph \u2192 coder \u2192 reviewer \u2192 tester \u2192 builder",
+  "agent_orchestrator": "deepseek_harness",
+  "sandbox": "opensandbox",
+  "blender": "optional",
+  "supabase": "auth + database + cloud_save",
+  "gdunit4": "testing",
+  "policy": ["Latest stable Godot", "No auto-upgrade without testing", "No deploy without QA pass", "Human-reviewed legal compliance"]
+}

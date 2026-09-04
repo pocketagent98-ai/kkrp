@@ -1,0 +1,9 @@
+{
+  "engine": "godot-4.7.2",
+  "renderer": "mobile",
+  "target_fps": 60,
+  "build_size_target": "<150 MB",
+  "min_android_version": "8.0",
+  "orientation": "landscape",
+  "export_format": "APK"
+}

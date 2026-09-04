@@ -1,0 +1,11 @@
+{
+  "mission_type": "level_based",
+  "total_missions": 5,
+  "missions": [
+    {"level": 1, "name": "Desert Dawn", "objective": "Reach finish line", "time_limit": 60, "coins": 20, "stars": 3},
+    {"level": 2, "name": "Sand Storm", "objective": "Navigate sandstorm", "time_limit": 55, "coins": 25, "stars": 3},
+    {"level": 3, "name": "Desert to City", "objective": "Reach city outskirts", "time_limit": 50, "coins": 30, "stars": 3},
+    {"level": 4, "name": "City Rush", "objective": "Race through city", "time_limit": 45, "coins": 35, "stars": 3},
+    {"level": 5, "name": "Singapore Skyline", "objective": "Final neon challenge", "time_limit": 40, "coins": 40, "stars": 3}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Desert Rush: City Builder Escape",
+  "version": "1.0.0",
+  "genre": "hyper-casual",
+  "platform": "android",
+  "engine": "godot-4.7.2",
+  "offline": true,
+  "tagline": "No Ads, No Paywall — Pure Fun",
+  "target_markets": ["UAE", "Singapore", "Gulf", "Southeast Asia"],
+  "languages": ["en", "ar", "hi", "ms"]
+}
