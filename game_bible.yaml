@@ -1,0 +1,152 @@
+# ============================================
+# KKRP Game Factory - Game Bible Template
+# ============================================
+# Copy this file, fill in your game details,
+# and run the workflow. The factory will build
+# your game automatically.
+#
+# Usage:
+#   1. Fill in game spec below
+#   2. Commit to repository
+#   3. Run GitHub Actions workflow "Game Factory"
+#   4. Get your game build
+# ============================================
+
+game:
+  title: "Desert Rush: City Builder Escape"
+  version: "1.0.0"
+  genre: "hyper-casual"
+  platform: "android"  # android, ios, web, desktop
+  engine: "godot-4.7.2"
+  offline: true
+  multiplayer: false
+
+  description: >
+    A 3D offline hyper-casual game where the player
+    controls a delivery driver navigating from desert
+    to modern city. Avoid obstacles, collect coins,
+    and complete levels within the time limit.
+
+  target_markets:
+    - "UAE"
+    - "Singapore"
+    - "Gulf"
+    - "Southeast Asia"
+
+  languages:
+    - "en"
+    - "ar"
+    - "hi"
+    - "ms"
+
+  monetization:
+    current: "none"
+    future:
+      - "cosmetic_skins"
+      - "season_pass"
+      - "optional_ads_game_over_only"
+
+world:
+  type: "linear_levels"
+  total_levels: 5
+  themes:
+    - name: "Desert Dawn"
+      environment: "desert"
+      time_of_day: "dawn"
+    - name: "Sand Storm"
+      environment: "desert"
+      weather: "sandstorm"
+    - name: "Desert to City"
+      environment: "transition"
+    - name: "City Rush"
+      environment: "city"
+      time_of_day: "day"
+    - name: "Singapore Skyline"
+      environment: "city"
+      time_of_day: "night"
+
+player:
+  character: "delivery_driver"
+  vehicle: "car"
+  controls:
+    - "touch_swipe"
+    - "on_screen_buttons"
+    - "keyboard_arrow_keys"
+  abilities:
+    - "lane_change"
+    - "jump"
+    - "collect_coins"
+  lanes: 3
+
+gameplay:
+  core_mechanic: "avoid_obstacles_collect_coins"
+  timer: true
+  star_rating:
+    criteria:
+      - "speed"
+      - "coin_collection"
+      - "no_crashes"
+    max_stars: 3
+
+  obstacles:
+    desert:
+      - "camel"
+      - "sand_dune"
+      - "sandstorm"
+      - "construction_barrier"
+    city:
+      - "traffic_cone"
+      - "barrier"
+      - "drone"
+      - "construction_zone"
+
+  collectibles:
+    - "coins"
+    - "power_ups"  # future
+
+  progression:
+    - "complete_level"
+    - "unlock_new_theme"
+    - "beat_high_score"
+
+audio:
+  background_music:
+    style: "middle_eastern_electronic_fusion"
+    instruments: ["oud", "synth", "percussion"]
+  sound_effects:
+    - "engine_rev"
+    - "coin_collect"
+    - "crash"
+    - "level_complete_jingle"
+    - "desert_wind"
+    - "city_traffic"
+  voice_over:
+    languages: ["ar", "en", "hi"]
+    phrases: ["Yalla!", "Chalo!", "Let's go!"]
+
+technical:
+  build_size_target: "<150 MB"
+  target_fps: 60
+  min_android_version: "8.0"
+  min_ios_version: "14.0"
+  resolution: "adaptive"
+
+storage_architecture:
+  source_code: "github"
+  large_assets: "cloudflare_r2"
+  backup: "backblaze_b2"
+  user_data: "supabase"
+  ai_models: "huggingface"
+
+ai_pipeline:
+  planner: "capability_registry"
+  orchestrator: "deepseek_harness"
+  sandbox: "opensandbox"
+  asset_generation:
+    detailed_3d: "blender_worker"
+    simple_procedural: "godot_procedural"
+    world_generation: "cosmos_worker"
+  testing:
+    unit: "gdunit4"
+    gameplay_qa: "automated_agent"
+    security: "strix_sast"

@@ -1,0 +1,182 @@
+name: Game Factory
+
+on:
+  workflow_dispatch:
+    inputs:
+      game_bible:
+        description: 'Path to game bible YAML file'
+        required: false
+        default: 'game_bible.yaml'
+      build_target:
+        description: 'Build target (web, android, desktop)'
+        required: false
+        default: 'web'
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: "4.7.2"
+  GODOT_FLAVOR: "stable"
+
+jobs:
+  # ==========================================
+  # STAGE 1: Parse & Validate Bible
+  # ==========================================
+  parse-bible:
+    runs-on: ubuntu-latest
+    outputs:
+      game_title: ${{ steps.parse.outputs.game_title }}
+      game_engine: ${{ steps.parse.outputs.game_engine }}
+      build_target: ${{ steps.parse.outputs.build_target }}
+      project_id: ${{ steps.parse.outputs.project_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse Game Bible
+        id: parse
+        run: |
+          # Install yq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+          BIBLE="${{ inputs.game_bible || 'game_bible.yaml' }}"
+          echo "Parsing $BIBLE..."
+
+          GAME_TITLE=$(yq '.game.title' "$BIBLE")
+          GAME_ENGINE=$(yq '.game.engine' "$BIBLE")
+          BUILD_TARGET="${{ inputs.build_target || 'web' }}"
+
+          # Generate project ID
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          PROJECT_ID="GME-${TIMESTAMP}"
+
+          echo "game_title=${GAME_TITLE}" >> $GITHUB_OUTPUT
+          echo "game_engine=${GAME_ENGINE}" >> $GITHUB_OUTPUT
+          echo "build_target=${BUILD_TARGET}" >> $GITHUB_OUTPUT
+          echo "project_id=${PROJECT_ID}" >> $GITHUB_OUTPUT
+
+          echo "::notice::Project ID: ${PROJECT_ID}"
+          echo "::notice::Game: ${GAME_TITLE}"
+          echo "::notice::Engine: ${GAME_ENGINE}"
+          echo "::notice::Build Target: ${BUILD_TARGET}"
+
+          # Create project directory structure
+          mkdir -p "projects/${PROJECT_ID}/source"
+          mkdir -p "projects/${PROJECT_ID}/releases"
+          mkdir -p "projects/${PROJECT_ID}/assets"
+          mkdir -p "projects/${PROJECT_ID}/builds"
+          mkdir -p "projects/${PROJECT_ID}/reports"
+
+  # ==========================================
+  # STAGE 2: Build Game (Web/HTML5)
+  # ==========================================
+  build-web:
+    needs: parse-bible
+    runs-on: ubuntu-latest
+    if: needs.parse-bible.outputs.build_target == 'web'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Project
+        run: |
+          PROJECT_ID="${{ needs.parse-bible.outputs.project_id }}"
+          mkdir -p "projects/${PROJECT_ID}/builds/web"
+          # Copy game files
+          cp index.html "projects/${PROJECT_ID}/builds/web/"
+          cp game_bible.yaml "projects/${PROJECT_ID}/"
+          echo "Project ${PROJECT_ID} ready."
+
+      - name: Validate HTML
+        run: |
+          PROJECT_ID="${{ needs.parse-bible.outputs.project_id }}"
+          if [ -f "projects/${PROJECT_ID}/builds/web/index.html" ]; then
+            echo "✅ HTML game file found"
+            # Basic validation
+            grep -q "<!DOCTYPE html>" "projects/${PROJECT_ID}/builds/web/index.html" && echo "✅ Valid HTML5 doctype"
+            grep -q "three" "projects/${PROJECT_ID}/builds/web/index.html" && echo "✅ Three.js loaded"
+            grep -q "Desert Rush" "projects/${PROJECT_ID}/builds/web/index.html" && echo "✅ Game title found"
+          else
+            echo "❌ HTML file not found"
+            exit 1
+          fi
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.parse-bible.outputs.project_id }}-web
+          path: projects/${{ needs.parse-bible.outputs.project_id }}/builds/web/
+          retention-days: 30
+
+      - name: Commit Project
+        run: |
+          git config user.name "Game Factory Bot"
+          git config user.email "actions@github.com"
+          git add projects/
+          git commit -m "🎮 Game Factory: ${{ needs.parse-bible.outputs.game_title }} [${{ needs.parse-bible.outputs.project_id }}]" || echo "No changes to commit"
+          git push
+
+  # ==========================================
+  # STAGE 3: Build Android (Future - Godot)
+  # ==========================================
+  build-android:
+    needs: parse-bible
+    runs-on: ubuntu-latest
+    if: needs.parse-bible.outputs.build_target == 'android'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Godot
+        run: |
+          echo "Godot ${GODOT_VERSION} Android build"
+          echo "This stage will be activated when Godot project files are added."
+          echo "For now, the HTML5 web build is the primary target."
+      - name: Note
+        run: |
+          echo "::notice::Android build requires Godot project files."
+          echo "::notice::Use the web build target for HTML5 games."
+
+  # ==========================================
+  # STAGE 4: Generate Release Report
+  # ==========================================
+  release-report:
+    needs: [parse-bible, build-web]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate Report
+        run: |
+          PROJECT_ID="${{ needs.parse-bible.outputs.project_id }}"
+          mkdir -p "projects/${PROJECT_ID}/reports"
+
+          cat > "projects/${PROJECT_ID}/reports/release_report.md" << 'EOF'
+          # Game Factory Release Report
+
+          ## Project Information
+          - **Project ID:** ${{ needs.parse-bible.outputs.project_id }}
+          - **Game Title:** ${{ needs.parse-bible.outputs.game_title }}
+          - **Engine:** ${{ needs.parse-bible.outputs.game_engine }}
+          - **Build Target:** ${{ needs.parse-bible.outputs.build_target }}
+          - **Build Date:** $(date -u)
+
+          ## Build Status
+          - Web Build: ${{ needs.build-web.result }}
+
+          ## Next Steps
+          1. Download the web build artifact
+          2. Open index.html in a browser
+          3. Test on mobile device
+          4. For Android APK, add Godot project files and trigger android build
+
+          ## Storage Architecture
+          - Source Code: GitHub
+          - Large Assets: Cloudflare R2
+          - Backup: Backblaze B2
+          - User Data: Supabase
+          - AI Models: Hugging Face
+          EOF
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.parse-bible.outputs.project_id }}-report
+          path: projects/${{ needs.parse-bible.outputs.project_id }}/reports/

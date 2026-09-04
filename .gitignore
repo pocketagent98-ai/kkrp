@@ -1,0 +1,36 @@
+# Godot
+.godot/
+*.import
+export_presets.cfg
+
+# Build outputs
+*.apk
+*.aab
+*.ipa
+*.exe
+*.dmg
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Secrets
+.env
+*.secret
+credentials.json
+
+# Project builds (tracked via artifacts)
+projects/*/builds/
+projects/*/releases/

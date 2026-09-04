@@ -1,0 +1,20 @@
+{
+  "INTERNET": {
+    "required": false,
+    "reason": "Offline game - no network required",
+    "used_for": [],
+    "disclosed_to_user": true
+  },
+  "VIBRATE": {
+    "required": true,
+    "reason": "Haptic feedback on collisions and coin collection",
+    "used_for": ["game_feedback"],
+    "disclosed_to_user": true
+  },
+  "LOCATION": {
+    "required": false,
+    "reason": "Not needed for this game",
+    "used_for": [],
+    "disclosed_to_user": false
+  }
+}
