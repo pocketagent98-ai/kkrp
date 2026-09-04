@@ -1,0 +1,43 @@
+; Engine configuration file.
+config_version=5
+
+[application]
+config/name="Desert Rush: City Builder Escape"
+config/description="3D offline hyper-casual game - Desert to City journey"
+run/main_scene="res://scenes/Main.tscn"
+config/features=ProjectSettings("4.7.2", "Forward+")
+
+[autoload]
+GameConfig="*res://scripts/GameConfig.gd"
+GameManager="*res://scripts/GameManager.gd"
+
+[display]
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/handheld/orientation=1
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[input]
+move_left={"deadzone": 0.5, "events": [Object(InputEventKey,"physical_keycode":4194319), Object(InputEventKey,"physical_keycode":65)]}
+move_right={"deadzone": 0.5, "events": [Object(InputEventKey,"physical_keycode":4194321), Object(InputEventKey,"physical_keycode":68)]}
+jump={"deadzone": 0.5, "events": [Object(InputEventKey,"physical_keycode":4194320), Object(InputEventKey,"physical_keycode":87), Object(InputEventKey,"physical_keycode":32)]}
+pause={"deadzone": 0.5, "events": [Object(InputEventKey,"physical_keycode":80), Object(InputEventKey,"physical_keycode":4194305)]}
+
+[rendering]
+renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
+anti_aliasing/quality/msaa_3d=1
+environment/defaults/default_clear_color=Color(0.96, 0.79, 0.63, 1)
+
+[android]
+package/name="com.kkrp.desertrush"
+package/unique_name="com.kkrp.desertrush"
+version/code=1
+version/name="1.0.0"
+min_sdk=21
+target_sdk=34
+permissions/custom_permissions=PoolStringArray("android.permission.VIBRATE")
+launch/play_store_category="Games"
+landscape/landscape=true
+screen/use_immersive_mode=true
